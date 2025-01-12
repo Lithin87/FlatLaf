@@ -1,57 +1,32 @@
 package com.example.flatlaf;
 
-import com.formdev.flatlaf.FlatLightLaf;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
+
+import jakarta.annotation.PostConstruct;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 
-@SpringBootApplication
-public class FlatlafApplication {
-    public static void main(String[] args) {
-        SpringApplicationBuilder builder = new SpringApplicationBuilder(FlatlafApplication.class);
-        builder.headless(false);
-        ConfigurableApplicationContext context = builder.run(args);
-
-        SwingUtilities.invokeLater(() -> {
-            try {
-                UIManager.setLookAndFeel(new FlatLightLaf());
-                FlatLafDemo frame = context.getBean(FlatLafDemo.class);
-                frame.setVisible(true);
-            } catch (Exception ex) {
-                System.err.println("Failed to initialize FlatLaf");
-            }
-        });
-    }
-}
 
 @Component
-class FlatLafDemo extends JFrame {
+class AnsibleParser extends JFrame {
 
 	@Value("${app.window.title:FlatLaf Demo}")
     private String windowTitle;
 	
 	@Autowired
-    private  SomeService someService;
+    SomeService someService;
 	@Autowired
-    private  AnotherService anotherService;
-
-
-    public FlatLafDemo() {
-        initializeUI();
-    }
+    AnotherService anotherService;
     
+    @PostConstruct
     private void initializeUI() {
 		setTitle(windowTitle);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(400, 300);
+        setSize(1100, 600);
         setLocationRelativeTo(null);
         
         JPanel mainPanel = new JPanel();
@@ -69,6 +44,18 @@ class FlatLafDemo extends JFrame {
         
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+        int result = fileChooser.showOpenDialog(null);
+        
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            System.out.println("Selected file: " + selectedFile.getAbsolutePath());
+        }
+
+
+
         
         mainPanel.add(titleLabel, BorderLayout.NORTH);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
@@ -77,17 +64,4 @@ class FlatLafDemo extends JFrame {
     }
 }
 
-@Component
-class SomeService {
-    public String getTitle() {
-        return "Enter your text:";
-    }
-}
 
-
-@Service
-class AnotherService {
-    public String processText(String text) {
-        return "as"
-    }
-}
